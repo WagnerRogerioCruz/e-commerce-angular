@@ -1,0 +1,25 @@
+.secao-produtos {
+    margin-top: 16px;
+}
+
+.secao-produtos h2 {
+    font-size: 1.4rem;
+    margin-bottom: 1.25rem;
+    color: #333;
+}
+
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.25rem;
+}
+
+.card-produto {
+    background-color: white;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
