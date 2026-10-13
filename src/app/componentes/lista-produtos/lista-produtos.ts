@@ -15,4 +15,8 @@ export class ListaProdutos {
   constructor(private productService: Produto) {
     this.produtos = this.productService.produtos;
   }
+
+  receberProduto(produto: any) {
+    console.log('Produto adicionado:', produto?.title);
+  }
 }

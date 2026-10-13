@@ -2,7 +2,7 @@
     <h2>Catálogo de produtos</h2>
     <div class="cards-grid">
         @for (item of produtos; track item.id) {
-            <app-card-produto [produto]="item"></app-card-produto>
+            <app-card-produto [produto]="item" (adicionar)="receberProduto($event)"></app-card-produto>
         }
     </div>
 </section>
