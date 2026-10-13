@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Carrinho } from '../../services/carrinho';
 
 @Component({
   imports: [],
@@ -6,4 +7,7 @@ import { Component } from '@angular/core';
   styleUrl: './cabecalho.css',
   templateUrl: './cabecalho.html',
 })
-export class Cabecalho {}
+
+export class Cabecalho {
+  constructor(public cartService: Carrinho) {};
+}
