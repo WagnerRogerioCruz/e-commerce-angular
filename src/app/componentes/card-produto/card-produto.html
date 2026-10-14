@@ -3,8 +3,9 @@
         <img [src]="produto?.image" [alt]="produto?.title" />
     </div>
     <div class="card-conteudo">
-        <h3 class="produto-nome">{{ produto?.title }}</h3>
-        <p class="produto-preco">R$ {{ produto?.price }}</p>
+        <h3 class="produto-nome">{{ produto?.title | uppercase }}</h3>
+        <p class="produto-descricao">{{ produto?.description | truncate: 50 }}</p>
+        <p class="produto-preco">{{ produto?.price | currency: 'BRL' }}</p>
         <button type="button" class="btn-comprar" (click)="clicouComprar()" >Adicionar ao Carrinho</button>
     </div>
 </div>
