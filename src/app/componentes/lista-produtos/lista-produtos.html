@@ -1,13 +1,27 @@
 <section class="secao-produtos">
     <h2>Catálogo de produtos</h2>
-    @if (carregando()) {
-        <p class="mensagem-carregando">Carregando vitrine de produtos...</p>
-    }
-    @else {
-        <div class="cards-grid">
-            @for (item of produtos(); track item.id) {
-                <app-card-produto [produto]="item" (adicionar)="receberProduto($event)"></app-card-produto>
-            }
+    <!-- Campo de Busca Reativo solicitado pelo professor -->
+        <div class="busca-container style-search mb-4" style="min-width: 280px;">
+            <input 
+                type="text" 
+                class="form-control" 
+                [formControl]="campoBusca" 
+                placeholder="🔍 Pesquisar produto por nome ou categoria..." 
+            />
         </div>
-    }
+        @if (carregando()) {
+            <div class="text-center my-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Carregando...</span>
+                </div>
+                <p class="mt-2">Carregando vitrine de produtos...</p>
+            </div>
+        }
+        @else {
+            <div class="cards-grid">
+                @for (item of produtos(); track item.id) {
+                    <app-card-produto [produto]="item"></app-card-produto>
+                }
+            </div>
+        }
 </section>

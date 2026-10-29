@@ -1,11 +1,26 @@
-<div class="card-produto">
-    <div class="card-imagem">
-        <img [src]="produto?.image" [alt]="produto?.title" />
+<div class="card h-100 shadow-sm p-3 d-flex flex-column justify-content-between">
+    <div [routerLink]="['/produto', produto?.id]" class="text-center" style="cursor: pointer;">
+        <div class="card-imagem mb-2" style="height: 150px; display: flex; align-items: center; justify-content: center;">
+            <img [src]="produto?.image" [alt]="produto?.title" class="img-fluid" style="max-height: 100%; object-fit: contain;" />
+        </div>
+        <div class="card-conteudo">
+            <h5 class="produto-nome fs-6 fw-bold text-dark mb-1">{{ produto?.title | uppercase | truncate: 35 }}</h5>
+            <p class="produto-descricao text-muted small mb-2">{{ produto?.description | truncate: 45 }}</p>
+            
+            @if (produto?.price && produto!.price > 100) {
+                <p class="mb-0 text-muted small">DE: <span class="preco-antigo text-decoration-line-through">{{ produto?.price | currency: 'BRL' }}</span></p>
+                <p class="produto-preco text-success fw-bold mb-1">POR: {{ produto!.price | discount: 15 | currency: 'BRL' }}</p>
+            } @else {
+                <p class="produto-preco text-success fw-bold mb-1">{{ produto?.price | currency: 'BRL' }}</p>
+            }
+            <span class="text-primary small">Ver Detalhes &rarr;</span>
+        </div>
     </div>
-    <div class="card-conteudo">
-        <h3 class="produto-nome">{{ produto?.title | uppercase }}</h3>
-        <p class="produto-descricao">{{ produto?.description | truncate: 50 }}</p>
-        <p class="produto-preco">{{ produto?.price | currency: 'BRL' }}</p>
-        <button type="button" class="btn-comprar" (click)="clicouComprar()" >Adicionar ao Carrinho</button>
+
+    <!-- Botão ajustado: centralizado e sem ocupar 100% da largura -->
+    <div class="text-center mt-3">
+        <button type="button" class="btn btn-primary btn-sm px-3" (click)="adicionarAoCarrinho()">
+            Adicionar ao Carrinho
+        </button>
     </div>
 </div>

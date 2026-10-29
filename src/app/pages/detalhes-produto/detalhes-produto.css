@@ -1,0 +1,14 @@
+
+
+.produto-preco {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #198754;
+  margin: 0 0 1rem;
+}
+
+.preco-antigo {
+    text-decoration: line-through;
+    color: #888; /* Opcional: deixa o preço antigo com uma cor mais cinza/suave */
+    font-size: 0.9rem; /* Opcional: diminui um pouco o tamanho */
+}

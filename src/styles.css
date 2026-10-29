@@ -9,3 +9,29 @@ body {
   background-color: #f8f9fa;
   color: #222222;
 }
+
+/* Ajustes globais de responsividade para imagens e containers */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Responsividade para grades e containers principais */
+@media (max-width: 768px) {
+  .checkout-container,
+  .secao-produtos {
+    padding: 0 0.5rem;
+  }
+
+  /* Garante que o grid de produtos mude para 1 coluna em mobile */
+  .cards-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Ajustes para telas médias (tablets) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}

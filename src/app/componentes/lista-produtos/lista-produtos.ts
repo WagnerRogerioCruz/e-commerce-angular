@@ -1,10 +1,12 @@
-import { Component, OnInit, signal } from '@angular/core';
-import { Carrinho } from '../../services/carrinho';
+import { Component, OnInit, signal, inject } from '@angular/core';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { Store } from '@ngrx/store';
+//import { adicionarProduto } from '../../store/cart';
 import { Produto, ItemProduto } from '../../services/produto';
 import { CardProduto } from '../card-produto/card-produto';
 
 @Component({
-  imports: [CardProduto],
+  imports: [CardProduto, ReactiveFormsModule],
   selector: 'app-lista-produtos',
   styleUrl: './lista-produtos.css',
   templateUrl: './lista-produtos.html',
@@ -12,30 +14,54 @@ import { CardProduto } from '../card-produto/card-produto';
 
 export class ListaProdutos implements OnInit {
 
-  produtos = signal<ItemProduto[]>([]);
+  produtosOriginais: ItemProduto[] = []; // Guarda a lista completa da API
+  produtos = signal<ItemProduto[]>([]); // Guarda a lista filtrada exibida na tela
   carregando = signal(true);
 
-  constructor(
-    private productService: Produto,
-    private cartService: Carrinho
-  ) {}
+  // Requisito do documento: FormControl para busca reativa
+  campoBusca = new FormControl('');
 
+  private productService = inject(Produto);
+  private store = inject(Store); // Injetando a Store do NgRx
 
   ngOnInit(): void {
     this.carregarProdutos();
+    this.configurarBuscaReativa();
   }
 
   carregarProdutos(): void {
-    // Simulação de uma API que demora 2 segundos para responder
     this.carregando.set(true);
-    setTimeout(() => {
-      this.produtos.set(this.productService.produtos);
-      this.carregando.set(false);
-    }, 2000);
+    
+    // Chamando a API
+    this.productService.obterProdutos().subscribe({
+      next: (dadosDaApi) => {
+        console.log('Dados recebidos com sucesso da API:', dadosDaApi); // Verifique o F12 do navegador
+        this.produtosOriginais = dadosDaApi;
+        this.produtos.set(dadosDaApi); // Atualiza o signal com os dados reais do banco/API
+        this.carregando.set(false); // Desativa o "Carregando..."
+      }, 
+      error: (erro) => {
+        console.error('Erro ao buscar produtos da API:', erro.message);
+        this.carregando.set(false); // Desativa o "Carregando..."
+        alert('Erro ao carregar a lista de produtos')
+      }
+    });
   }
 
-  receberProduto(produto: any) {
-    console.log('Produto adicionado:', produto?.title);
-    this.cartService.adicionar(produto);
+  // Requisito técnico do PDF: Usar valueChanges (Observable) para reagir às digitações
+  configurarBuscaReativa(): void {
+    this.campoBusca.valueChanges.subscribe((termoBusca) => {
+      const termo = (termoBusca || '').toLowerCase().trim();
+      
+      if (!termo) {
+        this.produtos.set(this.produtosOriginais);
+      } else {
+        const filtrados = this.produtosOriginais.filter(p => 
+          p.title.toLowerCase().includes(termo) || 
+          p.category.toLowerCase().includes(termo)
+        );
+        this.produtos.set(filtrados);
+      }
+    });
   }
 }

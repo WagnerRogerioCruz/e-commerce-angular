@@ -1,20 +1,36 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CurrencyPipe, UpperCasePipe } from '@angular/common';
+import { Component, Input, inject } from '@angular/core';
+import { CommonModule, CurrencyPipe, UpperCasePipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { Store } from '@ngrx/store';
 import { ItemProduto } from '../../services/produto';
+import { adicionarProduto } from '../../store/cart';
 import { TruncatePipe } from '../../pipes/truncate-pipe';
+import { DiscountPipe } from '../../pipes/discount-pipe';
+
 
 @Component({
-  imports: [CurrencyPipe, UpperCasePipe, TruncatePipe],
+  imports: [CommonModule, CurrencyPipe, UpperCasePipe, TruncatePipe, DiscountPipe, RouterLink],
   selector: 'app-card-produto',
   styleUrl: './card-produto.css',
   templateUrl: './card-produto.html',
 })
 
 export class CardProduto {
-  @Input() produto?: ItemProduto;
-  @Output() adicionar = new EventEmitter<any>();
+  @Input({ required: true }) produto?: ItemProduto;
 
-  clicouComprar() {
-    this.adicionar.emit(this.produto)
+  private store = inject(Store);
+
+  adicionarAoCarrinho(): void {
+    const item = this.produto;
+    if (item) {
+      // Aplica a mesma regra de desconto da página de detalhes
+      const precoFinal = item.price > 100 ? item.price - (item.price * (15 / 100)) : item.price;
+
+      this.store.dispatch(adicionarProduto({
+        produto: item,
+        quantidade: 1,
+        price: precoFinal
+      }));
+    }
   }
 }

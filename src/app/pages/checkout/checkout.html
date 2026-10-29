@@ -1,0 +1,214 @@
+<section class="checkout-container">
+    <h2 class="checkout-titulo">Finalizar Compra</h2>
+
+    @if (pedidoConcluido()){
+        <div class="alerta-sucesso">
+            <h3>🎉 Pedido realizado com sucesso!</h3>
+            <p>Obrigado pela sua compra! Os detalhes do pagamento e entrega foram enviados para o seu e-mail.</p>
+
+            <!-- Exibição condicional do pagamento APÓS a finalização -->
+            @if (formaPagamentoSelecionada() === 'pix') {
+                <div class="pix-container text-center p-3 my-4 border rounded bg-light">
+                    <p class="fw-bold mb-2">📱 Escaneie o QR Code abaixo para pagar com PIX:</p>
+                    <div class="qr-code-box mb-3">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=PagamentoPixLojaVirtualWRCruz" alt="QR Code PIX" class="img-thumbnail" />
+                    </div>
+                    <p class="small text-muted mb-2">Ou copie a chave Pix Copia e Cola:</p>
+                    <div class="input-group mb-2 justify-content-center">
+                        <input type="text" class="form-control form-control-sm text-center font-monospace" style="max-width: 350px;" readonly value="00020126580014br.gov.bcb.pix0136wrcruz..." />
+                        <button class="btn btn-outline-primary btn-sm" type="button" (click)="copiarChavePix()">
+                            {{ codigoPixCopiado() ? 'Copiado! ✓' : 'Copiar Código' }}
+                        </button>
+                    </div>
+                    @if (codigoPixCopiado()) {
+                        <small class="text-success fw-bold d-block mt-1">Chave Pix copiada para a área de transferência!</small>
+                    }
+                </div>
+            }
+
+            @if (formaPagamentoSelecionada() === 'boleto') {
+                <div class="boleto-container p-3 my-4 border rounded bg-light text-center">
+                    <p class="fw-bold mb-2">📄 Boleto Bancário Gerado com Sucesso</p>
+                    <p class="small text-muted">Vencimento em 3 dias úteis. O pedido será confirmado após a compensação bancária.</p>
+                    <div class="codigo-barras p-2 bg-white border mb-3 font-monospace small mx-auto" style="max-width: 400px;">
+                        34191.79001 01043.510047 91020.9 6 92830000015000
+                    </div>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">
+                        🖨️ Imprimir / Salvar Boleto
+                    </button>
+                </div>
+            }
+
+            <a routerLink="/" class="btn btn-primary mt-3">Voltar para a Loja</a>
+        </div>
+    } @else if (quantidade() === 0) {
+        <div class="carrinho-vazio">
+            <p>Seu carrinho está vazio no momento.</p>
+            <a routerLink="/" class="btn btn-primary mt-2">Explorar Produtos</a>
+        </div>
+    } @else {
+        <!-- Alerta global de aviso de preenchimento incorreto -->
+        @if (tentouEnviar() && checkoutForm.invalid) {
+            <div class="alert alert-danger mb-4 text-center fw-bold p-3 rounded" style="background-color: #f8d7da; color: #842029; border: 1px solid #f5c2c7;">
+                ⚠️ Por favor, corrija os campos que estão incorretos ou não preenchidos antes de finalizar o pedido.
+            </div>
+        }
+
+        <div class="checkout-grid">
+            <div class="formulario-card">
+                <h3>Dados da Entrega e Pagamento</h3>
+                <form [formGroup]="checkoutForm" (ngSubmit)="finalizarPedido()" novalidate>
+                    <!-- Nome -->
+                    <div class="campo-grupo">
+                        <label for="nome">Nome Completo *</label>
+                        <input
+                            id="nome"
+                            type="text"
+                            class="form-control"
+                            [class.campo-invalido]="isCampoInvalido('nome')"
+                            formControlName="nome"
+                            placeholder="Digite seu nome completo"
+                        />
+                        @if (isCampoInvalido('nome')) {
+                            <small class="mensagem-erro">O nome é obrigatório e deve ter no mínimo 3 caracteres.</small>
+                        }
+                    </div>
+
+                    <!-- E-mail -->
+                    <div class="campo-grupo">
+                        <label for="email">E-mail *</label>
+                        <input
+                            id="email"
+                            type="email"
+                            class="form-control"
+                            [class.campo-invalido]="isCampoInvalido('email')"
+                            formControlName="email"
+                            placeholder="exemplo@email.com"
+                        />
+                        @if (isCampoInvalido('email')) {
+                            <small class="mensagem-erro">Informe um e-mail válido.</small>
+                        }
+                    </div>
+
+                    <!-- CEP -->
+                    <div class="campo-grupo">
+                        <label for="cep">CEP *</label>
+                        <input
+                            id="cep"
+                            type="text"
+                            class="form-control"
+                            [class.campo-invalido]="isCampoInvalido('cep')"
+                            formControlName="cep"
+                            (input)="onCepInput($event)"
+                            maxlength="9"
+                            placeholder="00000-000"
+                        />
+                        @if (isCampoInvalido('cep')) {
+                            <small class="mensagem-erro">Informe um CEP válido (ex: 12345-678).</small>
+                        }
+                    </div>
+
+                    <!-- Endereço -->
+                    <div class="campo-grupo">
+                        <label for="endereco">Endereço de Entrega *</label>
+                        <input
+                            id="endereco"
+                            type="text"
+                            class="form-control"
+                            [class.campo-invalido]="isCampoInvalido('endereco')"
+                            formControlName="endereco"
+                            placeholder="Rua, número, complemento e bairro"
+                        />
+                        @if (isCampoInvalido('endereco')) {
+                            <small class="mensagem-erro">O endereço deve ter no mínimo 5 caracteres.</small>
+                        }
+                    </div>
+
+                    <!-- Cidade -->
+                    <div class="campo-grupo">
+                        <label for="cidade">Cidade *</label>
+                        <input
+                            id="cidade"
+                            type="text"
+                            class="form-control"
+                            [class.campo-invalido]="isCampoInvalido('cidade')"
+                            formControlName="cidade"
+                            placeholder="Digite sua cidade"
+                        />
+                        @if (isCampoInvalido('cidade')) {
+                            <small class="mensagem-erro">A cidade é obrigatória.</small>
+                        }
+                    </div>
+
+                    <!-- Forma de Pagamento -->
+                    <div class="campo-grupo">
+                        <label for="pagamento">Forma de Pagamento *</label>
+                        <select id="pagamento" class="form-select" formControlName="pagamento">
+                            <option value="cartao">Cartão de Crédito</option>
+                            <option value="pix">PIX</option>
+                            <option value="boleto">Boleto Bancário</option>
+                        </select>
+                    </div>
+
+                    <!-- Campos de Cartão de Crédito (Aparecem apenas se a opção selecionada for cartão) -->
+                    @if (checkoutForm.get('pagamento')?.value === 'cartao') {
+                        <div class="campo-grupo">
+                            <label for="numeroCartao">Número do Cartão *</label>
+                            <input
+                                id="numeroCartao"
+                                type="text"
+                                class="form-control"
+                                [class.campo-invalido]="isCampoInvalido('numeroCartao')"
+                                formControlName="numeroCartao"
+                                (input)="onCartaoInput($event)"
+                                maxlength="19"
+                                placeholder="0000 0000 0000 0000"
+                            />
+                            @if (isCampoInvalido('numeroCartao')) {
+                                <small class="mensagem-erro">O número do cartão deve ter exatamente 16 dígitos.</small>
+                            }
+                        </div>
+
+                        <div class="campo-grupo">
+                            <label for="codigoSeguranca">CVV (Código de Segurança) *</label>
+                            <input
+                                id="codigoSeguranca"
+                                type="text"
+                                class="form-control"
+                                [class.campo-invalido]="isCampoInvalido('codigoSeguranca')"
+                                formControlName="codigoSeguranca"
+                                (input)="onCvvInput($event)"
+                                maxlength="3"
+                                placeholder="123"
+                            />
+                            @if (isCampoInvalido('codigoSeguranca')) {
+                                <small class="mensagem-erro">O CVV deve ter exatamente 3 dígitos numéricos.</small>
+                            }
+                        </div>
+                    }
+
+                    <button type="submit" class="btn btn-success btn-block mt-3">
+                        Confirmar e Finalizar Pedido
+                    </button>
+                </form>
+            </div>
+
+            <div class="resumo-card">
+                <h3>Resumo do Pedido</h3>
+                <p class="resumo-quantidade">Total de itens: <strong>{{ quantidade() }}</strong></p>
+
+                <ul class="lista-itens">
+                    @for (item of itens(); track item.produto.id) {
+                        <li class="item-linha">
+                            <img [src]="item.produto.image" [alt]="item.produto.title" class="item-miniatura" />
+                            <div class="item-info">
+                                <span class="item-titulo">{{ item.produto.title }}</span>
+                                <span class="item-preco">{{ item.price | currency: 'BRL' }} (Qtd: {{ item.quantidade }})</span>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    }
+</section>

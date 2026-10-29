@@ -12,10 +12,18 @@ describe('Rodape', () => {
 
     fixture = TestBed.createComponent(Rodape);
     component = fixture.componentInstance;
-    await fixture.whenStable();
+    fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('deve renderizar o texto de direitos autorais e turma corretamente', () => {
+    const compiled = fixture.nativeElement as HTMLElement;
+    const footerText = compiled.querySelector('footer')?.textContent;
+    
+    expect(footerText).toContain('Ada Tech');
+    expect(footerText).toContain('Turma 1727');
   });
 });

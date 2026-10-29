@@ -1,0 +1,57 @@
+<!-- Sidebar do Carrinho (Fica flutuando sobre a tela quando aberto) -->
+@if (cartService.estaAberto()) {
+    <div class="overlay" (click)="cartService.alternarCarrinho()"></div>
+    
+    <aside class="sidebar-carrinho">
+        <div class="sidebar-header">
+            <h3>Seu Carrinho de Compras</h3>
+            <button type="button" class="btn-fechar" (click)="cartService.alternarCarrinho()">✕</button>
+        </div>
+
+        <div class="sidebar-body">
+            @if (itens().length === 0) {
+                <p class="carrinho-vazio">Seu carrinho está vazio.</p>
+            } @else {
+                <ul class="lista-itens-carrinho">
+                    @for (item of itens(); track item.produto.id) {
+                        <li class="item-carrinho">
+                            <div class="item-esquerda">
+                                <img [src]="item.produto.image" [alt]="item.produto.title" class="img-miniatura">
+                                <div class="info-produto">
+                                    <h4>{{ item.produto.title }}</h4>
+                                    <span class="preco">{{ item.produto.price | currency: 'BRL' }} un</span>
+                                    
+                                    <div class="controles-qtd">
+                                        <button type="button" (click)="diminuir(item.produto.id)">-</button>
+                                        <span>{{ item.quantidade }}</span>
+                                        <button type="button" (click)="aumentar(item)">+</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Subtotal do produto à direita -->
+                            <div class="item-subtotal">
+                                <strong>{{ (item.price * item.quantidade) | currency: 'BRL' }}</strong>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+
+        <div class="esvaziar-carrinho">
+            <button type="button" class="btn btn-sm btn-danger ms-2" (click)="esvaziarCarrinho()">Esvaziar Carrinho</button>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="total-geral">
+                <span>Total a Pagar:</span>
+                <strong>{{ valorTotal() | currency: 'BRL' }}</strong>
+            </div>
+            <a routerLink="/checkout">
+                <button type="button" class="btn-finalizar" (click)="cartService.alternarCarrinho()">Finalizar Compra</button>
+            </a>
+        </div>
+    </aside>
+}
+
